@@ -14,14 +14,33 @@ from search import *
 #################
 class TowerSorting(Problem):
 
+    # TODO : Faire un itérateur et non une liste
     def actions(self, state):
-        pass
+        actions = [] # Tuples containing top of the tower to
+        for i in range(state.number):
+            if len(state.grid[i]) == 0:
+                continue
+            for j in range(0, len(state.grid)):
+                if (i == j):
+                    continue
+                if len(state.grid[j]) != state.size:
+                    actions.append((i, j))
+        return actions
 
     def result(self, state, action):
-        pass
+        new_grid = deepcopy(state.grid)
+        top = new_grid[action[0]].pop()
+        new_grid[action[1]].append(top)
+        return State(state.number, state.size, new_grid, "tower " + str(action[0]) + " -> tower " + str(action[1]))
 
     def goal_test(self, state):
-        pass
+        for i in range(state.number - 1):
+            if (len(state.grid[i]) != len(self.goal[i])):
+                return False
+            for j in range(state.size):
+                if state.grid[i][j] != self.goal[i][j]:
+                    return False
+        return True
 
 
 ###############
@@ -82,7 +101,8 @@ if __name__ == "__main__":
     number, size, initial_grid = read_instance_file(filepath)
 
     init_state = State(number, size, initial_grid, "Init")
-    problem = TowerSorting(init_state)
+    goal = [[i] * size for i in range(1, number)] + [[]] # Goal state
+    problem = TowerSorting(init_state, goal)
     # Example of search
     start_timer = time.perf_counter()
     node, nb_explored, remaining_nodes = depth_first_tree_search(problem)
