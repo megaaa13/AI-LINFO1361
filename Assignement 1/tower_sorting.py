@@ -34,13 +34,8 @@ class TowerSorting(Problem):
         return State(state.number, state.size, new_grid, "tower " + str(action[0]) + " -> tower " + str(action[1]))
 
     def goal_test(self, state):
-        for i in range(state.number - 1):
-            if (len(state.grid[i]) != len(self.goal[i])):
-                return False
-            for j in range(state.size):
-                if state.grid[i][j] != self.goal[i][j]:
-                    return False
-        return True
+        if self.goal == state:
+            return True       
 
 
 ###############
@@ -66,10 +61,11 @@ class State:
         return s
 
     def __eq__(self, other):
-        pass
+        return hash(self) == hash(other)
 
     def __hash__(self):
-        pass
+        tupled_grid = tuple([tuple(tower) for tower in self.grid])
+        return hash((self.number, self.size, tupled_grid))
 
 
 ######################
@@ -101,11 +97,11 @@ if __name__ == "__main__":
     number, size, initial_grid = read_instance_file(filepath)
 
     init_state = State(number, size, initial_grid, "Init")
-    goal = [[i] * size for i in range(1, number)] + [[]] # Goal state
+    goal = State(number, size, [[str(i)] * size for i in range(1, number)] + [[]], "Goal") # Goal state
     problem = TowerSorting(init_state, goal)
     # Example of search
     start_timer = time.perf_counter()
-    node, nb_explored, remaining_nodes = depth_first_tree_search(problem)
+    node, nb_explored, remaining_nodes = depth_first_graph_search(problem)
     end_timer = time.perf_counter()
 
     # Example of print
