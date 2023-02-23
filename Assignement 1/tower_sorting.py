@@ -16,15 +16,16 @@ class TowerSorting(Problem):
 
     # TODO : Faire un itérateur et non une liste
     def actions(self, state):
-        actions = [] # Tuples containing top of the tower to
+        # An action is a tuple (list index src, list index dest)
+        actions = []
         for i in range(state.number):
-            if len(state.grid[i]) == 0:
-                continue
-            for j in range(0, len(state.grid)):
-                if (i == j):
-                    continue
-                if len(state.grid[j]) != state.size:
+            # No number in this tower
+            if len(state.grid[i]) == 0: continue
+            # Move each top number to all other tower
+            for j in range(state.number):
+                if len(state.grid[j]) != state.size and (i != j):
                     actions.append((i, j))
+        
         return actions
 
     def result(self, state, action):
@@ -34,9 +35,14 @@ class TowerSorting(Problem):
         return State(state.number, state.size, new_grid, "tower " + str(action[0]) + " -> tower " + str(action[1]))
 
     def goal_test(self, state):
-        if self.goal == state:
-            return True       
-
+        is_goal = True
+        for i in range(state.number):
+            current = state.grid[i][0] if len(state.grid[i]) > 0 else None
+            for j in range(len(state.grid[i])):
+                if state.grid[i][j] != current: 
+                    is_goal = False
+                    break
+        return is_goal 
 
 ###############
 # State class #
@@ -44,10 +50,10 @@ class TowerSorting(Problem):
 class State:
 
     def __init__(self, number, size, grid, move="Init"):
-        self.number = number
-        self.size = size
-        self.grid = grid
-        self.move = move
+        self.number = number    # Number of towers
+        self.size = size        # Size of each tower 
+        self.grid = grid        # Grid of the towers
+        self.move = move        # Move that led to this state
 
     def __str__(self):
         s = self.move + "\n"
@@ -62,7 +68,7 @@ class State:
 
     def __eq__(self, other):
         return hash(self) == hash(other)
-
+    
     def __hash__(self):
         tupled_grid = tuple([tuple(tower) for tower in self.grid])
         return hash((self.number, self.size, tupled_grid))
@@ -97,11 +103,11 @@ if __name__ == "__main__":
     number, size, initial_grid = read_instance_file(filepath)
 
     init_state = State(number, size, initial_grid, "Init")
-    goal = State(number, size, [[str(i)] * size for i in range(1, number)] + [[]], "Goal") # Goal state
-    problem = TowerSorting(init_state, goal)
+    problem = TowerSorting(init_state)
+
     # Example of search
     start_timer = time.perf_counter()
-    node, nb_explored, remaining_nodes = depth_first_graph_search(problem)
+    node, nb_explored, remaining_nodes = breadth_first_graph_search(problem) # BFS find the shortest path
     end_timer = time.perf_counter()
 
     # Example of print
@@ -109,7 +115,7 @@ if __name__ == "__main__":
 
     for n in path:
         # assuming that the __str__ function of state outputs the correct format
-        print(n.state)
+        print(n.state.move)
 
     print("* Execution time:\t", str(end_timer - start_timer))
     print("* Path cost to goal:\t", node.depth, "moves")
