@@ -17,16 +17,13 @@ class TowerSorting(Problem):
     # TODO : Faire un itérateur et non une liste
     def actions(self, state):
         # An action is a tuple (list index src, list index dest)
-        actions = []
         for i in range(state.number):
             # No number in this tower
             if len(state.grid[i]) == 0: continue
             # Move each top number to all other tower
             for j in range(state.number):
                 if len(state.grid[j]) != state.size and (i != j):
-                    actions.append((i, j))
-        
-        return actions
+                    yield (i, j)
 
     def result(self, state, action):
         new_grid = deepcopy(state.grid)
