@@ -18,7 +18,7 @@ class TowerSorting(Problem):
         # An action is a tuple (list index src, list index dest)
         for i in range(state.number):
             # No number in this tower
-            if len(state.grid[i]) == 0 or (len(state.grid[i]) == state.size and len(np.unique(state.grid[i])) == 1): continue
+            if len(state.grid[i]) == 0: continue #  or (len(state.grid[i]) == state.size and len(np.unique(state.grid[i])) == 1)
             # Move each top number to all other tower
             for j in range(state.number):
                 if len(state.grid[j]) != state.size and (i != j):
