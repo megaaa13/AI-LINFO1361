@@ -13,13 +13,14 @@ from search import *
 # Problem class #
 #################
 class TowerSorting(Problem):
+    # !Depth of the node in the search tree
+    current_depth = -1
 
-    # TODO : Faire un itérateur et non une liste
     def actions(self, state):
         # An action is a tuple (list index src, list index dest)
         for i in range(state.number):
             # No number in this tower
-            if len(state.grid[i]) == 0: continue
+            if len(state.grid[i]) == 0 or (len(state.grid[i]) == state.size and len(np.unique(state.grid[i])) == 1): continue
             # Move each top number to all other tower
             for j in range(state.number):
                 if len(state.grid[j]) != state.size and (i != j):
@@ -29,11 +30,19 @@ class TowerSorting(Problem):
         new_grid = deepcopy(state.grid)
         top = new_grid[action[0]].pop()
         new_grid[action[1]].append(top)
-        return State(state.number, state.size, new_grid, "tower " + str(action[0]) + " -> tower " + str(action[1]))
+        return State(state.number, state.size, new_grid, "tower " + str(action[0]) + " -> tower " + str(action[1]), state.depth + 1)
 
     def goal_test(self, state):
+        # !Print the depth of the node
+        if (state.depth != TowerSorting.current_depth):
+            print("Depth: ", state.depth)
+            TowerSorting.current_depth = state.depth
+        
         is_goal = True
         for i in range(state.number):
+            if not is_goal or (len(state.grid[i]) != 0 and len(state.grid[i]) != state.size):
+                is_goal = False
+                break
             current = state.grid[i][0] if len(state.grid[i]) > 0 else None
             for j in range(len(state.grid[i])):
                 if state.grid[i][j] != current: 
@@ -46,11 +55,12 @@ class TowerSorting(Problem):
 ###############
 class State:
 
-    def __init__(self, number, size, grid, move="Init"):
+    def __init__(self, number, size, grid, move="Init", depth=0):
         self.number = number    # Number of towers
         self.size = size        # Size of each tower 
         self.grid = grid        # Grid of the towers
         self.move = move        # Move that led to this state
+        self.depth = depth      # !Depth of the node in the search tree
 
     def __str__(self):
         s = self.move + "\n"
@@ -109,10 +119,11 @@ if __name__ == "__main__":
 
     # Example of print
     path = node.path()
-
+    
+    # !Print the path
     for n in path:
-        # assuming that the __str__ function of state outputs the correct format
         print(n.state.move)
+    print(n.state)
 
     print("* Execution time:\t", str(end_timer - start_timer))
     print("* Path cost to goal:\t", node.depth, "moves")
