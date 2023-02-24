@@ -25,10 +25,10 @@ class TowerSorting(Problem):
                     yield (i, j)
 
     def result(self, state, action):
-        new_grid = deepcopy(state.grid)
-        top = new_grid[action[0]].pop()
-        new_grid[action[1]].append(top)
-        return State(state.number, state.size, new_grid, "tower " + str(action[0]) + " -> tower " + str(action[1]))
+        new_grid = list(state.grid)
+        new_grid[action[0]] = state.grid[action[0]][:-1]
+        new_grid[action[1]] = state.grid[action[1]] + tuple(state.grid[action[0]][-1])
+        return State(state.number, state.size, tuple(new_grid), "tower " + str(action[0]) + " -> tower " + str(action[1]))
 
     def goal_test(self, state):
         is_goal = True
@@ -69,8 +69,7 @@ class State:
         return hash(self) == hash(other)
     
     def __hash__(self):
-        tupled_grid = tuple([tuple(tower) for tower in self.grid])
-        return hash((self.number, self.size, tupled_grid))
+        return hash(self.grid)
 
 
 ######################
@@ -90,7 +89,8 @@ def read_instance_file(filepath):
 
     for tower in initial_grid:
         tower.reverse()
-
+    # change lists to tuples
+    initial_grid = tuple([tuple(tower) for tower in initial_grid])
     return number_tower, size_tower, initial_grid
 
 
