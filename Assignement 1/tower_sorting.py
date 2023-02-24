@@ -13,8 +13,6 @@ from search import *
 # Problem class #
 #################
 class TowerSorting(Problem):
-    # !Depth of the node in the search tree
-    current_depth = -1
 
     def actions(self, state):
         # An action is a tuple (list index src, list index dest)
@@ -30,14 +28,9 @@ class TowerSorting(Problem):
         new_grid = deepcopy(state.grid)
         top = new_grid[action[0]].pop()
         new_grid[action[1]].append(top)
-        return State(state.number, state.size, new_grid, "tower " + str(action[0]) + " -> tower " + str(action[1]), state.depth + 1)
+        return State(state.number, state.size, new_grid, "tower " + str(action[0]) + " -> tower " + str(action[1]))
 
     def goal_test(self, state):
-        # !Print the depth of the node
-        if (state.depth != TowerSorting.current_depth):
-            print("Depth: ", state.depth)
-            TowerSorting.current_depth = state.depth
-        
         is_goal = True
         for i in range(state.number):
             if not is_goal or (len(state.grid[i]) != 0 and len(state.grid[i]) != state.size):
@@ -60,7 +53,6 @@ class State:
         self.size = size        # Size of each tower 
         self.grid = grid        # Grid of the towers
         self.move = move        # Move that led to this state
-        self.depth = depth      # !Depth of the node in the search tree
 
     def __str__(self):
         s = self.move + "\n"
@@ -120,10 +112,8 @@ if __name__ == "__main__":
     # Example of print
     path = node.path()
     
-    # !Print the path
     for n in path:
-        print(n.state.move)
-    print(n.state)
+        print(n.state)
 
     print("* Execution time:\t", str(end_timer - start_timer))
     print("* Path cost to goal:\t", node.depth, "moves")
