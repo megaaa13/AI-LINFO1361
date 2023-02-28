@@ -12,6 +12,9 @@ from collections import deque
 from utils import *
 import numpy as np
 
+# TODO: remove this
+from breaking import *
+
 
 class Problem:
     """The abstract class for a formal problem. You should subclass
@@ -189,6 +192,11 @@ def breadth_first_tree_search(problem):
 
     explored_nodes = 0
     while frontier:
+
+        # TODO : À supprimer
+        if handler.SIGUSR1:
+            break
+
         node = frontier.popleft()
         explored_nodes += 1
         if problem.goal_test(node.state):
@@ -210,6 +218,11 @@ def depth_first_tree_search(problem):
 
     explored_nodes = 0
     while frontier:
+
+        # TODO : À supprimer
+        if handler.SIGUSR1:
+            break
+
         node = frontier.pop()
         explored_nodes += 1
         if problem.goal_test(node.state):
@@ -232,6 +245,11 @@ def depth_first_graph_search(problem):
     explored = set()
     explored_nodes = 0
     while frontier:
+
+        # TODO : À supprimer
+        if handler.SIGUSR1:
+            break
+        
         node = frontier.pop()
         explored_nodes += 1
         if problem.goal_test(node.state):
@@ -255,6 +273,11 @@ def breadth_first_graph_search(problem):
     explored = dict()
     explored_nodes = 0
     while frontier:
+
+        # TODO: remove this
+        if handler.SIGUSR1:
+            break
+
         node = frontier.popleft()
         if node.state in explored: 
             continue
