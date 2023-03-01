@@ -1,0 +1,276 @@
+Starting measurement
+
+Measuring instances/i01 with bfsg
+* Execution time:	 13.369824346969835
+* Path cost to goal:	 13 moves
+* #Nodes explored:	 208077
+* Queue size at goal:	 450205
+
+Measuring instances/i01 with bfst
+CAUTION: Timout received !
+* Execution time:	 197.25950305402512
+* Path cost to goal:	 None
+* #Nodes explored:	 2711211
+* Queue size at goal:	 20589049
+
+Measuring instances/i01 with dfsg
+CAUTION: Timout received !
+* Execution time:	 179.6948394899955
+* Path cost to goal:	 None
+* #Nodes explored:	 5648
+* Queue size at goal:	 17503
+
+Measuring instances/i01 with dfst
+CAUTION: Timout received !
+* Execution time:	 235.48812358803116
+* Path cost to goal:	 None
+* #Nodes explored:	 5034130
+* Queue size at goal:	 17619477
+
+Measuring instances/i02 with bfsg
+* Execution time:	 0.376229701039847
+* Path cost to goal:	 8 moves
+* #Nodes explored:	 6070
+* Queue size at goal:	 17518
+
+Measuring instances/i02 with bfst
+CAUTION: Timout received !
+CAUTION: Timout received !
+* Execution time:	 205.24458962597419
+* Path cost to goal:	 None
+* #Nodes explored:	 2797395
+* Queue size at goal:	 21255628
+
+Measuring instances/i02 with dfsg
+CAUTION: Timout received !
+* Execution time:	 179.76322664500913
+* Path cost to goal:	 None
+* #Nodes explored:	 5650
+* Queue size at goal:	 17508
+
+Measuring instances/i02 with dfst
+CAUTION: Timout received !
+* Execution time:	 215.8921482959995
+* Path cost to goal:	 None
+* #Nodes explored:	 4910568
+* Queue size at goal:	 17187004
+
+Measuring instances/i03 with bfsg
+* Execution time:	 0.3351264329976402
+* Path cost to goal:	 8 moves
+* #Nodes explored:	 4118
+* Queue size at goal:	 12516
+
+Measuring instances/i03 with bfst
+* Execution time:	 154.42382451094454
+* Path cost to goal:	 8 moves
+* #Nodes explored:	 2355589
+* Queue size at goal:	 17864448
+
+Measuring instances/i03 with dfsg
+CAUTION: Timout received !
+* Execution time:	 179.84427894599503
+* Path cost to goal:	 None
+* #Nodes explored:	 5601
+* Queue size at goal:	 17103
+
+Measuring instances/i03 with dfst
+CAUTION: Timout received !
+* Execution time:	 227.80513037496712
+* Path cost to goal:	 None
+* #Nodes explored:	 4978492
+* Queue size at goal:	 17424726
+
+Measuring instances/i04 with bfsg
+* Execution time:	 1.8155046200263314
+* Path cost to goal:	 10 moves
+* #Nodes explored:	 28334
+* Queue size at goal:	 73885
+
+Measuring instances/i04 with bfst
+CAUTION: Timout received !
+* Execution time:	 206.18964192998828
+* Path cost to goal:	 None
+* #Nodes explored:	 2816987
+* Queue size at goal:	 21403490
+
+Measuring instances/i04 with dfsg
+CAUTION: Timout received !
+CAUTION: Timout received !
+* Execution time:	 179.73571845400147
+* Path cost to goal:	 None
+* #Nodes explored:	 5738
+* Queue size at goal:	 17151
+
+Measuring instances/i04 with dfst
+CAUTION: Timout received !
+* Execution time:	 219.1600478470209
+* Path cost to goal:	 None
+* #Nodes explored:	 4928106
+* Queue size at goal:	 17248387
+
+Measuring instances/i05 with bfsg
+* Execution time:	 1.924804189009592
+* Path cost to goal:	 8 moves
+* #Nodes explored:	 21755
+* Queue size at goal:	 131559
+
+Measuring instances/i05 with bfst
+CAUTION: Timout received !
+* Execution time:	 213.17673591600033
+* Path cost to goal:	 None
+* #Nodes explored:	 2005748
+* Queue size at goal:	 23028761
+
+Measuring instances/i05 with dfsg
+CAUTION: Timout received !
+* Execution time:	 179.66913463396486
+* Path cost to goal:	 None
+* #Nodes explored:	 3737
+* Queue size at goal:	 17642
+
+Measuring instances/i05 with dfst
+CAUTION: Timout received !
+* Execution time:	 477.59041998599423
+* Path cost to goal:	 None
+* #Nodes explored:	 3926459
+* Queue size at goal:	 19632306
+
+Measuring instances/i06 with bfsg
+* Execution time:	 1.8894566349918023
+* Path cost to goal:	 7 moves
+* #Nodes explored:	 18050
+* Queue size at goal:	 105411
+
+Measuring instances/i06 with bfst
+CAUTION: Timout received !
+CAUTION: Timout received !
+* Execution time:	 210.08775190700544
+* Path cost to goal:	 None
+* #Nodes explored:	 1926016
+* Queue size at goal:	 22682449
+
+Measuring instances/i06 with dfsg
+CAUTION: Timout received !
+* Execution time:	 179.6963550869841
+* Path cost to goal:	 None
+* #Nodes explored:	 3632
+* Queue size at goal:	 18205
+
+Measuring instances/i06 with dfst
+CAUTION: Timout received !
+* Execution time:	 464.79000938497484
+* Path cost to goal:	 None
+* #Nodes explored:	 3918494
+* Queue size at goal:	 19592483
+
+Measuring instances/i07 with bfsg
+* Execution time:	 1.3722444950253703
+* Path cost to goal:	 7 moves
+* #Nodes explored:	 14196
+* Queue size at goal:	 86069
+
+Measuring instances/i07 with bfst
+CAUTION: Timout received !
+* Execution time:	 210.67829916003393
+* Path cost to goal:	 None
+* #Nodes explored:	 1922342
+* Queue size at goal:	 22721375
+
+Measuring instances/i07 with dfsg
+CAUTION: Timout received !
+CAUTION: Timout received !
+* Execution time:	 179.71395986003336
+* Path cost to goal:	 None
+* #Nodes explored:	 3733
+* Queue size at goal:	 17905
+
+Measuring instances/i07 with dfst
+CAUTION: Timout received !
+* Execution time:	 461.05184035998536
+* Path cost to goal:	 None
+* #Nodes explored:	 3918494
+* Queue size at goal:	 19592483
+
+Measuring instances/i08 with bfsg
+* Execution time:	 7.154207193991169
+* Path cost to goal:	 7 moves
+* #Nodes explored:	 56938
+* Queue size at goal:	 528852
+
+Measuring instances/i08 with bfst
+CAUTION: Timout received !
+* Execution time:	 211.48964562098263
+* Path cost to goal:	 None
+* #Nodes explored:	 1346820
+* Queue size at goal:	 21486906
+
+Measuring instances/i08 with dfsg
+CAUTION: Timout received !
+CAUTION: Timout received !
+* Execution time:	 179.7520042490214
+* Path cost to goal:	 None
+* #Nodes explored:	 2666
+* Queue size at goal:	 18538
+
+Measuring instances/i08 with dfst
+CAUTION: Timout received !
+* Execution time:	 731.3447455580463
+* Path cost to goal:	 None
+* #Nodes explored:	 3123663
+* Queue size at goal:	 20303818
+
+Measuring instances/i09 with bfsg
+* Execution time:	 7.123145182966255
+* Path cost to goal:	 7 moves
+* #Nodes explored:	 55583
+* Queue size at goal:	 498972
+
+Measuring instances/i09 with bfst
+CAUTION: Timout received !
+* Execution time:	 211.85978440899635
+* Path cost to goal:	 None
+* #Nodes explored:	 1310354
+* Queue size at goal:	 21513652
+
+Measuring instances/i09 with dfsg
+CAUTION: Timout received !
+* Execution time:	 179.80285331403138
+* Path cost to goal:	 None
+* #Nodes explored:	 2696
+* Queue size at goal:	 18748
+
+Measuring instances/i09 with dfst
+CAUTION: Timout received !
+* Execution time:	 716.8665674750227
+* Path cost to goal:	 None
+* #Nodes explored:	 3122955
+* Queue size at goal:	 20299231
+
+Measuring instances/i10 with bfsg
+* Execution time:	 5.251578122959472
+* Path cost to goal:	 6 moves
+* #Nodes explored:	 42437
+* Queue size at goal:	 410851
+
+Measuring instances/i10 with bfst
+CAUTION: Timout received !
+* Execution time:	 209.5115141160204
+* Path cost to goal:	 None
+* #Nodes explored:	 1329374
+* Queue size at goal:	 21496177
+
+Measuring instances/i10 with dfsg
+CAUTION: Timout received !
+* Execution time:	 179.7836402420071
+* Path cost to goal:	 None
+* #Nodes explored:	 2665
+* Queue size at goal:	 18531
+
+Measuring instances/i10 with dfst
+CAUTION: Timout received !
+* Execution time:	 724.4696742289816
+* Path cost to goal:	 None
+* #Nodes explored:	 3123660
+* Queue size at goal:	 20303821
+

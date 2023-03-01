@@ -1,6 +1,6 @@
 # Comment mesurer la performance avec *timeout* et imprimer les informations utiles ?
 
-## Automiser les mesures
+## Automatiser les mesures
 Le script shell suivant permet d'automatiser la prise de mesure. Pour ce faire, le script utilise 4 versions modifiées du fichier `tower_sorting.py`, chacun utilisiant une version différente de l'algorithme de recherche.
 ```bash
 #!/bin/bash
