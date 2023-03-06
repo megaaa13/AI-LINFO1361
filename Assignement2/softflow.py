@@ -28,12 +28,6 @@ class SoftFlow(Problem):
         new_grid[state.positions[action[0]][0]] = new_grid[state.positions[action[0]][0]][0:state.positions[action[0]][1]] + tuple(state.positions[action[0]][2]) + new_grid[state.positions[action[0]][0]][state.positions[action[0]][1] + 1:]
         # placing the letter
         new_grid[action[1][0]] = new_grid[action[1][0]][0:action[1][1]] + tuple(action[0]) + new_grid[action[1][0]][action[1][1] + 1:]
-        #new_grid[state.positions[action[0]][0]] = list(new_grid[state.positions[action[0]][0]])
-        #new_grid[state.positions[action[0]][0]][state.positions[action[0]][1]] = state.positions[action[0]][2]
-        #new_grid[state.positions[action[0]][0]] = tuple(new_grid[state.positions[action[0]][0]])
-        #new_grid[action[1][0]] = list(new_grid[action[1][0]])
-        #new_grid[action[1][0]][action[1][1]] = action[0]
-        #new_grid[action[1][0]] = tuple(new_grid[action[1][0]])
         new_state = State(tuple(new_grid), state.positions, state.goal_reached)
         new_state.positions[action[0]] = action[1]
         #print(new_state)
@@ -45,12 +39,9 @@ class SoftFlow(Problem):
             if (abs(state.positions[k][0] - self.goal[k][0]) + abs(state.positions[k][1] - self.goal[k][1]) == 1) and state.goal_reached[int(state.positions[k][2])] == False:
                 state.goal_reached[int(state.positions[k][2])] = True
                 #print("Goal reached: ", k)
-                #modify letters in the grid
+                #modify letters in the grid by the number
                 new_grid = list(state.grid)
                 new_grid[state.positions[k][0]] = new_grid[state.positions[k][0]][0:state.positions[k][1]] + tuple(state.positions[k][2]) + new_grid[state.positions[k][0]][state.positions[k][1] + 1:]
-                #new_grid[state.positions[k][0]] = list(new_grid[state.positions[k][0]])
-                #new_grid[state.positions[k][0]][state.positions[k][1]] = state.positions[k][2]
-                #new_grid[state.positions[k][0]] = tuple(new_grid[state.positions[k][0]])
                 state.grid = tuple(new_grid)
         #check if all goals are reached
         for k in state.goal_reached:
@@ -65,10 +56,9 @@ class SoftFlow(Problem):
             if node.state.goal_reached[int(node.state.positions[k][2])] == False:
                 h += abs(node.state.positions[k][0] - self.goal[k][0]) + abs(node.state.positions[k][1] - self.goal[k][1]) # manhattan distance
         #print(h)
-        for i in node.state.goal_reached: # prefer to choose path with already good solutions
+        """for i in node.state.goal_reached: # prefer to choose path with already good partial solutions
             if i == False:
-                h += 100
-        h += node.depth # optimal solution is the shortest one
+                h += 1 # manhattan distance"""
         return h
         
 
