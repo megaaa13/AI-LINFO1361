@@ -9,17 +9,18 @@ class SoftFlow(Problem):
     def __init__(self, initial, goal=None):
         self.initial = initial
         self.goal = goal if goal else self.get_goal(self.initial)
-        self.state = 1
         
         
     def actions(self, state):
+        actions = []
         for k in state.positions.keys():
             if state.goal_reached[int(state.positions[k][2])] == True:
                 continue
             for i in (-1, 0, 1):
                 for j in (-1, 0, 1):
                     if i != j and i != -j and state.grid[state.positions[k][0] + i][state.positions[k][1] + j] == ' ':
-                        yield (k, (state.positions[k][0] + i, state.positions[k][1] + j, state.positions[k][2]))
+                        actions.append((k, (state.positions[k][0] + i, state.positions[k][1] + j, state.positions[k][2])))
+        return actions
 
     def result(self, state, action):
         #print(action)
@@ -55,10 +56,6 @@ class SoftFlow(Problem):
         for k in node.state.positions.keys():
             if node.state.goal_reached[int(node.state.positions[k][2])] == False:
                 h += abs(node.state.positions[k][0] - self.goal[k][0]) + abs(node.state.positions[k][1] - self.goal[k][1]) # manhattan distance
-        #print(h)
-        """for i in node.state.goal_reached: # prefer to choose path with already good partial solutions
-            if i == False:
-                h += 1 # manhattan distance"""
         return h
         
 
