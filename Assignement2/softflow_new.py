@@ -13,6 +13,7 @@ class SoftFlow(Problem):
         
     def actions(self, state):
         # An action is a tuple (char, (xTo, yTo, integerTo))
+        actions = []
 
         # From the enc of the cable, we can go in 4 directions
         # only if the cell is empty
@@ -22,7 +23,8 @@ class SoftFlow(Problem):
                     for j in (-1, 0, 1):
                         # Not diagonal or the same cell AND the goal cell is empty
                         if i != j and i != -j and state.grid[state.positions[char][0] + i][state.positions[char][1] + j] == ' ':
-                            yield (char, (state.positions[char][0] + i, state.positions[char][1] + j, state.positions[char][2]))
+                            actions.append((char, (state.positions[char][0] + i, state.positions[char][1] + j, state.positions[char][2])))
+        return actions
 
     def result(self, state, action):
         # Copy the grid
