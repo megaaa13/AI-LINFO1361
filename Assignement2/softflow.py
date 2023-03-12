@@ -1,3 +1,4 @@
+#import time
 from search import *
 
 #################
@@ -10,74 +11,83 @@ class SoftFlow(Problem):
         self.initial = initial
         self.goal = goal if goal else self.get_goal(self.initial)
         
-        
     def actions(self, state):
+        # An action is a tuple (k, (xTo, yTo, integerTo))
         actions = []
+
+        # From the enc of the cable, we can go in 4 directions
+        # only if the cell is empty
         for k in state.positions.keys():
-            if state.goal_reached[int(state.positions[k][2])] == True:
-                continue
-            for i in (-1, 0, 1):
-                for j in (-1, 0, 1):
-                    if i != j and i != -j and state.grid[state.positions[k][0] + i][state.positions[k][1] + j] == ' ':
-                        actions.append((k, (state.positions[k][0] + i, state.positions[k][1] + j, state.positions[k][2])))
+            if not state.goals_reached[int(state.positions[k][2])]:
+                for i in (-1, 0, 1): 
+                    for j in (-1, 0, 1):
+                        # Not diagonal or the same cell AND the goal cell is empty
+                        if i != j and i != -j and state.grid[state.positions[k][0] + i][state.positions[k][1] + j] == ' ':
+                            actions.append((k, (state.positions[k][0] + i, state.positions[k][1] + j, state.positions[k][2])))
         return actions
 
     def result(self, state, action):
-        #print(action)
+        # Copy the grid
         new_grid = list(state.grid)
-        # replacing the letter by the pipe
+        # Replace the k in the grid by the number
         new_grid[state.positions[action[0]][0]] = new_grid[state.positions[action[0]][0]][0:state.positions[action[0]][1]] + tuple(state.positions[action[0]][2]) + new_grid[state.positions[action[0]][0]][state.positions[action[0]][1] + 1:]
-        # placing the letter
+        # Place the k in the new position
         new_grid[action[1][0]] = new_grid[action[1][0]][0:action[1][1]] + tuple(action[0]) + new_grid[action[1][0]][action[1][1] + 1:]
-        new_state = State(tuple(new_grid), state.positions, state.goal_reached)
+        
+        # Create the new state
+        new_state = State(tuple(new_grid), state.positions, state.goals_reached)
         new_state.positions[action[0]] = action[1]
-        #print(new_state)
         return new_state
 
     def goal_test(self, state):
-        #check if positions are nearby the goal
+        # Check if positions are nearby the goal
         for k in state.positions.keys():
-            if (abs(state.positions[k][0] - self.goal[k][0]) + abs(state.positions[k][1] - self.goal[k][1]) == 1) and state.goal_reached[int(state.positions[k][2])] == False:
-                state.goal_reached[int(state.positions[k][2])] = True
-                #print("Goal reached: ", k)
-                #modify letters in the grid by the number
+            if not state.goals_reached[int(state.positions[k][2])] and (abs(state.positions[k][0] - self.goal[k][0]) + abs(state.positions[k][1] - self.goal[k][1]) == 1):
+                # If the goal is reached, we update the state
+                state.goals_reached[int(state.positions[k][2])] = True
+                # Apply the move to the grid
                 new_grid = list(state.grid)
                 new_grid[state.positions[k][0]] = new_grid[state.positions[k][0]][0:state.positions[k][1]] + tuple(state.positions[k][2]) + new_grid[state.positions[k][0]][state.positions[k][1] + 1:]
                 state.grid = tuple(new_grid)
-        #check if all goals are reached
-        for k in state.goal_reached:
-            if k == False:
-                return False
-        #print("Goals: ", self.goal)
-        return True
+        
+        # Check if all goals are reached
+        return all(state.goals_reached)
 
     def h(self, node):
-        h = 0
+        h = 0.0
+
+        # Manhattan distance formula
+        d = lambda x1, y1, x2, y2: abs(x1 - x2) + abs(y1 - y2)
+
+        # Compute heuristic value
         for k in node.state.positions.keys():
-            if node.state.goal_reached[int(node.state.positions[k][2])] == False:
-                h += abs(node.state.positions[k][0] - self.goal[k][0]) + abs(node.state.positions[k][1] - self.goal[k][1]) # manhattan distance
-        return h
-        
+            if not node.state.goals_reached[int(node.state.positions[k][2])] :
+                h += d(node.state.positions[k][0], node.state.positions[k][1], self.goal[k][0], self.goal[k][1])
+
+        return h   
 
     def load(path):
         with open(path, 'r') as f:
             lines = f.readlines()
             
         state = State.from_string(''.join(lines))
-        #print(state)
         return SoftFlow(state)
     
+    def __make_alphabet(self):
+        # Return the alphabet-number links : {'a': 0, 'b': 1, ...}
+        return {str(idx): k for idx, k in enumerate('abcdefghij')}
+    
     def get_goal(self, state):
+        alphabet = self.__make_alphabet()
+
+        # Return the goal in the grid
         goal = {}
-        for k in state.positions.keys():
-            # search for the index in the grid 
-            # and add it to the goal
-            for i in range(state.nbr):
-                for j in range(state.nbc):
-                    if state.grid[i][j] == state.positions[k][2]:
-                        goal[k[0]] = (i, j) # False means that the goal is not reached
-        #print("Goals : ", goal)
+        for i, row in enumerate(state.grid):
+            for j, k in enumerate(row):
+                if k.isdigit():
+                    goal[alphabet[k]] = (i, j)
         return goal
+
 
 
 ###############
@@ -86,14 +96,16 @@ class SoftFlow(Problem):
 
 class State:
 
-
-    def __init__(self, grid, positions = None, goal = None):
-        self.nbr = len(grid)
-        self.nbc = len(grid[0])
+    def __init__(self, grid, positions=None, goals_reached=None):
+        # Grid values
+        self.nbr = len(grid)     # number of rows
+        self.nbc = len(grid[0])  # number of columns
         self.grid = grid
-        self.positions = positions.copy() if positions else self.get_positions(self)
-        self.goal_reached = goal.copy() if goal else [False for _ in range(len(self.positions))]
+
+        # Fast access
         self.hash = hash(self.grid)
+        self.positions = positions.copy() if positions else self.get_positions(self)  # positions of the end of cable in the grid
+        self.goals_reached = goals_reached.copy() if goals_reached else [False for _ in range(len(self.positions))]  # goals_reached
         
     def __str__(self):
         return '\n'.join(''.join(row) for row in self.grid)
@@ -113,48 +125,41 @@ class State:
             map(lambda x: tuple(x.strip()), lines)
         ))
     
+    def __make_alphabet(self):
+        # Return the alphabet-number links : {'a': 0, 'b': 1, ...}
+        return {k: idx for idx, k in enumerate('abcdefghij')}
+    
     def get_positions(self, state):
-        dict_alphabet = {}
-        idx = 0
-        for i in 'abcdefghijklmnopqrstuvwxyz':
-            dict_alphabet[i] = idx
-            idx += 1
+        alphabet = self.__make_alphabet()
+
+        # Get the positions of the letters in the grid : {'a': (x1, y1, '0'), 'b': (x2, y2, '1'), ...}
+        # if a is at position (x1, y1) and b is at position (x2, y2) in the grid
         positions = {}
-        idx = 0
-        for i in range(state.nbr):
-            for j in range(state.nbc):
-                idx = dict_alphabet.get(state.grid[i][j], None)
-                if idx != None:
-                    positions[state.grid[i][j]] = (i, j, str(idx))
-                    idx += 1
-        #print("Positions : ", positions)
-        return positions
-
-
-
-
+        for i, row in enumerate(state.grid):
+            for j, k in enumerate(row):
+                idx = alphabet.get(k, None)
+                if idx is not None:
+                    positions[k] = (i, j, str(idx))
+        return positions    
+    
 
 
 #####################
 # Launch the search #
 #####################
-#import time
+
 problem = SoftFlow.load(sys.argv[1])
+
 #start_timer = time.perf_counter()
-node = astar_search(problem, display=False)
+node = astar_search(problem)
 #end_timer = time.perf_counter()
+
 # example of print
 path = node.path()
 
 print('Number of moves: ', str(node.depth))
 for n in path:
-    """if (n.depth == 0):
-        print('initial state')
-    elif (n.depth == node.depth):
-        print('goal state')
-    else:
-        print('state', str(n.depth))"""
     print(n.state)  # assuming that the _str_ function of state outputs the correct format
     print()
+
 #print("* Execution time:\t", str(end_timer - start_timer))
-#print('Number of moves: ', str(node.depth))
