@@ -131,3 +131,5 @@ dmypy.json
 *.code-workspace
 
 .vscode/
+
+pontu_simulator/

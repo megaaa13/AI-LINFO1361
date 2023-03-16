@@ -18,6 +18,5 @@ measure() {
 export PYTHONPATH=aima-python3/
 for file in instances/* ; do
     echo "Measuring $file"
-    measure softflow_new.py $file
-
+    measure softflow.py $file
 done

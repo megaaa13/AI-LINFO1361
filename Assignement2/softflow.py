@@ -1,5 +1,6 @@
-#import time
-from search import *
+import time
+from search2 import *
+
 
 #################
 # Problem class #
@@ -150,16 +151,20 @@ class State:
 
 problem = SoftFlow.load(sys.argv[1])
 
-#start_timer = time.perf_counter()
-node = astar_search(problem)
-#end_timer = time.perf_counter()
+start_timer = time.perf_counter()
+node = astar_search(problem, display=True)
+#node, i = breadth_first_graph_search(problem)
+end_timer = time.perf_counter()
 
 # example of print
 path = node.path()
 
 print('Number of moves: ', str(node.depth))
 for n in path:
-    print(n.state)  # assuming that the _str_ function of state outputs the correct format
-    print()
+    #print(n.state)  # assuming that the _str_ function of state outputs the correct format
+    #print()
+    pass
 
-#print("* Execution time:\t", str(end_timer - start_timer))
+
+# print("* #Nodes explored:\t", i)
+print("* Execution time:\t", str(end_timer - start_timer))

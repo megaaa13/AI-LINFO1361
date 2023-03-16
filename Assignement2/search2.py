@@ -241,6 +241,7 @@ def breadth_first_graph_search(problem):
     single line as below:
     return graph_search(problem, FIFOQueue())
     """
+    i = 0
     node = Node(problem.initial)
     if problem.goal_test(node.state):
         return node
@@ -248,11 +249,12 @@ def breadth_first_graph_search(problem):
     explored = set()
     while frontier:
         node = frontier.popleft()
+        i+=1
         explored.add(node.state)
         for child in node.expand(problem):
             if child.state not in explored and child not in frontier:
                 if problem.goal_test(child.state):
-                    return child
+                    return child, i
                 frontier.append(child)
     return None
 
@@ -265,6 +267,8 @@ def best_first_graph_search(problem, f, display=False):
     There is a subtlety: the line "f = memoize(f, 'f')" means that the f
     values will be cached on the nodes as they are computed. So after doing
     a best first search you can examine the f values of the path returned."""
+    infos = []
+
     f = memoize(f, 'f')
     node = Node(problem.initial)
     frontier = PriorityQueue('min', f)
@@ -272,9 +276,18 @@ def best_first_graph_search(problem, f, display=False):
     explored = set()
     while frontier:
         node = frontier.pop()
+        
+        info = (node.state.positions['a'][0], node.state.positions['a'][1])
+        if info not in infos:
+            infos.append(info)
+        
         if problem.goal_test(node.state):
             if display:
                 print(len(explored), "paths have been expanded and", len(frontier), "paths remain in the frontier")
+            
+            for i in infos:
+                print(i)
+            
             return node
         explored.add(node.state)
         for child in node.expand(problem):
