@@ -1,7 +1,7 @@
 
 # TODO: renformat the imports for inginious
 from pontu_game.agent import AlphaBetaAgent
-import pontu_game.minimax
+import pontu_game.minimax as minimax
 
 
 class MyAgent(AlphaBetaAgent):
@@ -20,7 +20,10 @@ class MyAgent(AlphaBetaAgent):
   state s.
   """
   def successors(self, state):
-    pass
+    # Seems to be to easy... Have I missed something?
+    actions = state.get_current_player_actions()
+    for action in actions:
+        yield (action, state.copy().result(action))
 
   """
   The cutoff function returns true if the alpha-beta/minimax
