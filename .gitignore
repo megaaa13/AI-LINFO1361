@@ -133,3 +133,5 @@ dmypy.json
 .vscode/
 
 pontu_simulator/
+
+pontu_game/
