@@ -34,7 +34,7 @@ class MyAgent(AlphaBetaAgent):
   def cutoff(self, state, depth):
     if state.game_over():
         return True
-    if depth == 1:
+    if depth > 1:
         return True
     return False
 
@@ -43,12 +43,14 @@ class MyAgent(AlphaBetaAgent):
   representing the utility function of the board.
   """
   def evaluate(self, state: pontu_state.PontuState):
-    # Sum of the number of missing bridges adjacent to each of the opponent’s pawns
     nb_bridges = 0
+    nb_bridges_me = 0
     for i in range(0, state.size - 2):
         for bridge in state.adj_bridges(1 - self.id, i).values():
             if bridge:
                 nb_bridges += 1
-    # print("Evaluate : ", 12 - nb_bridges)    
-    return (state.size - 2) * 4 - nb_bridges
+        for bridge in state.adj_bridges(self.id, i).values():
+            if bridge:
+                nb_bridges_me += 1
+    return ((state.size - 2) * 4 - nb_bridges) + nb_bridges_me*1e-2
      

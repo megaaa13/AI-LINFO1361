@@ -135,3 +135,9 @@ dmypy.json
 pontu_simulator/
 
 pontu_game/
+
+Assignement3/agent.py
+
+Assignement3/minimax.py
+
+Assignement3/pontu_state.py
