@@ -52,5 +52,5 @@ class MyAgent(AlphaBetaAgent):
         for bridge in state.adj_bridges(self.id, i).values():
             if bridge:
                 nb_bridges_me += 1
-    return ((state.size - 2) * 4 - nb_bridges)*3 + nb_bridges_me
+    return ((state.size - 2) * 4 - nb_bridges) + nb_bridges_me*1e-2
      
