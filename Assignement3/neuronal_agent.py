@@ -9,7 +9,8 @@ class MyAgent(Agent):
         self.model = NeuralNet(52, 100, 17, 1)
         
         # Load the model from the file
-        self.model.load_state_dict(torch.load('model.pt'))
+        state_dict = torch.load('model.pt', map_location=torch.device('cpu'))
+        self.model.load_state_dict(state_dict)
         self.model.eval()
 
     def get_action(self, state, last_action, time_left):

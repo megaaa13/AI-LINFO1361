@@ -15,6 +15,10 @@ import torch.nn as nn
 from random_agent import MyAgent as RandomAgent
 from basic_agent import MyAgent as BasicAgent
 
+# Multi-processing
+import concurrent.futures
+import threading
+
 # Logging configuration
 logging.basicConfig(filename="games.log", level=logging.INFO, filemode="w")
 
@@ -251,7 +255,7 @@ class NeuralGenetic:
             - 1: Second player won.
             - 2: One player has done an invalid move or one player.
         '''
-        verbose = False
+        verbose = self.verbose
         if verbose: logging.info("Running the game between {} and {}.".format(str(model0.name), str(model1.name)))
 
         # Play the game
@@ -299,7 +303,7 @@ class NeuralGenetic:
             - 1: Second player won.
             - 2: One player has done an invalid move or one player.
         '''
-        verbose = True
+        verbose = self.verbose
         if verbose: logging.info("Running the game between {} and angent.".format(str(model.name)))
 
         # Prepare the game
@@ -415,7 +419,6 @@ class NeuralGenetic:
         '''
         Returns the best neural network after training.
         '''
-
         # Create the initial population
         population = self.generate_population()
 
@@ -423,11 +426,11 @@ class NeuralGenetic:
         for generation in range(self.nbr_generations):
             print("Generation {} over {} ".format(generation, self.nbr_generations))
             
-            # Compute the fitness of each model by 
+            # Compute the fitness of each model
             fitnesses = np.zeros(self.population_size)
             last_invalid_move = 0
             for i in range(self.population_size):
-                # Playing against other models
+                # Playing against other models if they finished a game at least 50% of the time
                 if last_invalid_move > 0.5:
                     for j in range(self.population_size):
                         if i != j:
@@ -441,7 +444,7 @@ class NeuralGenetic:
                 print("\r[{}{}] {}%".format("=" * progress, " " * (50 - progress), 100 * i / len(population)), end="")
 
             # Print the result and reset counters
-            print("\nWon: {:.2f}%, Loose: {:.2f}%, Invalid move: {:.2f}%, Turns: {}\n".format(100 * self.won / self.nb_runs, 100 * self.loose / self.nb_runs, 100 * self.invalid_move / self.nb_runs, self.turns / self.nb_runs))
+            print("\nWon: {:.2f}%, Loose: {:.2f}%, Invalid move: {:.2f}%, Turns: {:.2f}\n".format(100 * self.won / self.nb_runs, 100 * self.loose / self.nb_runs, 100 * self.invalid_move / self.nb_runs, self.turns / self.nb_runs))
             last_invalid_move = self.invalid_move
             self.won = 0; self.loose = 0; self.invalid_move = 0; self.nb_runs = 0; self.turns = 0
             # Evolve the population
@@ -452,12 +455,60 @@ class NeuralGenetic:
         idx = np.argsort(fitnesses)[::-1]
         return population[idx[0]]
     
+    def train_parrallel(self, additional_agent: list, max_threads = 10) -> NeuralNet:
+        '''
+        Returns the best neural network after training. This function uses multiprocessing.
+        '''
+        # Create the initial population
+        population = self.generate_population()
+
+        # Train the population
+        for generation in range(self.nbr_generations):
+            print("Generation {} over {} ".format(generation, self.nbr_generations))
+
+            # Compute the fitness of each model
+            fitnesses = np.zeros(self.population_size)
+            last_invalid_move = 0
+
+            # Start the multiprocessing
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_threads) as executor:
+                futures = []
+                for i in range(self.population_size):
+                    # Playing against other models if they finished a game at least 50% of the time
+                    if last_invalid_move > 0.5:
+                        for j in range(self.population_size):
+                            if i != j:
+                                futures.append(executor.submit(self.fitness_function, population[i], population[j]))
+                    # Playing against the additional agent
+                    for agent in additional_agent:
+                        futures.append(executor.submit(self.fitness_function, population[i], agent))
+                    
+                    # Compute the fitness
+                    fitnesses[i] = sum([f.result() for f in futures])
+                    futures = []                    
+                    # Print the progress
+                    progress = int(50 * i / len(population))
+                    print("\r[{}{}] {}%".format("=" * progress, " " * (50 - progress), 100 * i / len(population)), end="")
+
+            # Print the result and reset counters
+            print("\nWon: {:.2f}%, Loose: {:.2f}%, Invalid move: {:.2f}%, Turns: {}\n".format(100 * self.won / self.nb_runs, 100 * self.loose / self.nb_runs, 100 * self.invalid_move / self.nb_runs, self.turns / self.nb_runs))
+            last_invalid_move = self.invalid_move
+            self.won = 0; self.loose = 0; self.invalid_move = 0; self.nb_runs = 0; self.turns = 0
+            # Evolve the population
+            logging.info("population size: {}, fitnesses size {}.".format(len(population), len(fitnesses)))
+            population = self.envolve(population, fitnesses)
+        
+        # Return the best model
+        idx = np.argsort(fitnesses)[::-1]
+        return population[idx[0]]
+
+    
 
 if __name__ == "__main__":
     initial_state = PontuState()
 
     # Genetic algorithm parameters
-    population_size = 100
+    population_size = 10
     nbr_generations = 10
 
     mutation_rate = 0.1
@@ -479,6 +530,7 @@ if __name__ == "__main__":
 
     # Train the model
     model = genetic_algorithm.train(additional_agents)
+    # model = genetic_algorithm.train_parrallel(additional_agents, max_threads=10)
 
     # Save the model
-    torch.save(model, "model.pt")
+    torch.save(model.state_dict(), 'model.pt')
