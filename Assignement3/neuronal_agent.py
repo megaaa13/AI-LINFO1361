@@ -6,10 +6,10 @@ class MyAgent(Agent):
   
     def __init__(self):
         # Initialize an empty model
-        self.model = NeuralNet(52, 100, 17, 1)
+        self.model = NeuralNet(52, 100, 19, 1)
         
         # Load the model from the file
-        state_dict = torch.load('model.pt', map_location=torch.device('cpu'))
+        state_dict = torch.load('pre_trained.pt', map_location=torch.device('cpu'))
         self.model.load_state_dict(state_dict)
         self.model.eval()
 
