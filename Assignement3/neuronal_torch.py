@@ -33,7 +33,6 @@ class NeuralHelpers:
     '''
     Helper functions for neural networks
     '''
-
     @staticmethod
     def state_to_features(state: PontuState) -> np.ndarray:
         '''
@@ -169,7 +168,6 @@ class NeuralGenetic:
     '''
     Genetic algorithm for the Pontu game.
     '''
-
     @staticmethod
     def get_action(model: NeuralNet, state: PontuState) -> tuple:
         '''
