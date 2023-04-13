@@ -2,6 +2,7 @@
 from agent import AlphaBetaAgent
 import minimax as minimax
 import pontu_state as pontu_state
+import numpy as np
 
 
 class MyAgent(AlphaBetaAgent):
@@ -32,11 +33,9 @@ class MyAgent(AlphaBetaAgent):
 	search has to stop and false otherwise.
 	"""
 	def cutoff(self, state, depth):
-		print("Depth: ", depth)
-		print("Eval: ", self.evaluate(state) // 1e4)
 		if state.game_over():
 			return True
-		if depth > (self.evaluate(state) // 1e4):
+		if depth >= (self.evaluate(state) // 1e4) + 1:
 			return True
 		return False
 
@@ -63,7 +62,6 @@ class MyAgent(AlphaBetaAgent):
 		# Save one of our spawn (only if the next case has two or more bridges)
 		nb_pawn_safe_me = 0
 		for i in range(0, state.size - 2):
-			# print(state.adj_bridges(self.id, i).values())
 			if sum(1 for v in state.adj_bridges(self.id, i).values() if v == True) >= 2:
 				nb_pawn_safe_me += 1
 
@@ -73,6 +71,19 @@ class MyAgent(AlphaBetaAgent):
 			if state.is_pawn_blocked(1 - self.id, i):
 				nb_pawn_blocked_opponent += 1
 		
+		# Perfer dispersive play
+		list = []
+		for i in range(0, state.size - 2):
+			list.append(state.get_pawn_position(self.id, i))
+		
+		# print(list)
+
+		counter = 0
+		for i in range(0, len(list)):
+			for j in range(0, len(list)):
+				if list[i] != list[j] and ((list[i][1] - list[j][1]) + (list[i][0] - list[j][0])) == 1:
+					counter += 1
+
 		# Set a weight to our bridges to make playing offensive more interesting
 		# AABBCC.DD
 		#   - AA: number of oppenent pawn blocked
@@ -80,7 +91,7 @@ class MyAgent(AlphaBetaAgent):
 		#   - CC: number of oppenent's bridges
 		#   - DD: number of my bridges
 		weight = ((state.size - 2) * 4 - nb_bridges_opponent) + nb_bridges_me * 1e-2 \
-			+ nb_pawn_safe_me * 1e2 + nb_pawn_blocked_opponent * 1e4
+			+ nb_pawn_safe_me * 1e2 + nb_pawn_blocked_opponent * 1e4 + ((state.size - 2)**2 - counter) * 1e3
 		
 		# print("", weight, end="- ")
 		return weight
