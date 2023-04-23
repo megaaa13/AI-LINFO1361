@@ -23,6 +23,13 @@ class MyAgent(AlphaBetaAgent):
 	def successors(self, state: pontu_state.PontuState):
 		# Seems to be to easy... Have I missed something?
 		actions = state.get_current_player_actions()
+		to_remove_bridge = []
+		for i in range(0, state.size - 2):
+			pos = state.get_pawn_position(1 - self.id, i)
+			for bridge, val, val1, val2 in state.adj_bridges_pos(pos):
+				print(bridge)
+				if bridge:
+					to_remove_bridge.append((i, bridge))
 		for action in actions:
 			new_state = state.copy()
 			new_state.apply_action(action)
@@ -35,7 +42,7 @@ class MyAgent(AlphaBetaAgent):
 	def cutoff(self, state, depth):
 		if state.game_over():
 			return True
-		if depth >= (self.evaluate(state) // 1e4) + 1:
+		if depth > (self.evaluate(state) // 1e4) + 1:
 			return True
 		return False
 
@@ -90,8 +97,8 @@ class MyAgent(AlphaBetaAgent):
 		#   - BB: number of my pawn safe
 		#   - CC: number of oppenent's bridges
 		#   - DD: number of my bridges
-		weight = ((state.size - 2) * 4 - nb_bridges_opponent) + nb_bridges_me * 1e-2 \
-			+ nb_pawn_safe_me * 1e2 + nb_pawn_blocked_opponent * 1e4 + ((state.size - 2)**2 - counter) * 1e3
+		weight = ((state.size - 2) * 4 - nb_bridges_opponent) + nb_bridges_me * 1e-4 \
+			+ nb_pawn_safe_me * 1e-2 + nb_pawn_blocked_opponent * 1e4 + ((state.size - 2)**2 - counter) * 1e-6
 		
 		# print("", weight, end="- ")
 		return weight
