@@ -24,6 +24,7 @@ class MyAgent(AlphaBetaAgent):
 		available_actions_3 = [i for i in range(0, state.size - 1)]
 		available_actions_4 = [i for i in range(0, state.size)]
 		actions = []
+		
 		for i in range(state.size-2): # for each pawn
 			if not state.blocked[state.cur_player][i]: # if the pawn is not blocked
 				dirs = state.move_dir(state.cur_player,i)
