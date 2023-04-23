@@ -23,12 +23,13 @@ class MyAgent(AlphaBetaAgent):
 	def successors(self, state: pontu_state.PontuState):
 		actions = self.get_simply_actions(state)
 		# actions = state.get_current_player_actions()
-
-		np.random.shuffle(actions)
+		states = []
 		for action in actions:
 			new_state = state.copy()
-			new_state.apply_action(action)	
-			yield (action, new_state)
+			new_state.apply_action(action)
+			states.append((action, new_state))
+		states.sort(key=lambda x: self.evaluate(x[1]), reverse=True)
+		return states
 
 	def get_simply_actions(self, state: pontu_state.PontuState):
 		available_actions_3 = [i for i in range(0, state.size - 1)]
@@ -53,8 +54,7 @@ class MyAgent(AlphaBetaAgent):
 						if pos[1] in available_actions_3 and pos[0] in available_actions_4:
 							if state.v_bridges[pos[1]][pos[0]]:
 								actions.append((i,dir, 'v', pos[0], pos[1]))
-		
-		# then the valid actions consist only on the removal of one bridge
+								
 		if len(actions) == 0:
 			for pawn in range(state.size-2):
 				pos = state.get_pawn_position(1- self.id,pawn)
@@ -79,7 +79,13 @@ class MyAgent(AlphaBetaAgent):
 	def cutoff(self, state, depth):
 		if state.game_over():
 			return True
-		if depth > 2:
+		a = 0
+		for i in range(0, state.size - 2):
+			if state.is_pawn_blocked(self.id, i):
+				a += 1
+			if state.is_pawn_blocked(1 - self.id, i):
+				a += 1
+		if depth > a + 1:
 			return True
 		return False
 
@@ -93,15 +99,19 @@ class MyAgent(AlphaBetaAgent):
 
 		# Bridge count
 		for i in range(0, state.size - 2):
+			nb_bridges_opponent_temp = 0
+			nb_bridges_me_temp = 0
 			# Count opponent bridges
 			for bridge in state.adj_bridges(1 - self.id, i).values():
 				if bridge:
-					nb_bridges_opponent += 1
+					nb_bridges_opponent_temp += 1
+			nb_bridges_opponent += nb_bridges_opponent_temp ** 2
 			
 			# Count my bridges
 			for bridge in state.adj_bridges(self.id, i).values():
 				if bridge:
-					nb_bridges_me += 1
+					nb_bridges_me_temp += 1
+			nb_bridges_me += nb_bridges_me_temp ** 2
 
 		# Save one of our spawn (only if the next case has two or more bridges)
 		nb_pawn_safe_me = 0
@@ -123,8 +133,9 @@ class MyAgent(AlphaBetaAgent):
 		counter = 0
 		for i in range(0, len(list)):
 			for j in range(0, len(list)):
-				if list[i] != list[j] and ((list[i][1] - list[j][1]) + (list[i][0] - list[j][0])) == 1:
+				if list[i] != list[j] and (abs(list[i][1] - list[j][1]) + abs(list[i][0] - list[j][0])) == 1:
 					counter += 1
+
 
 		# Set a weight to our bridges to make playing offensive more interesting
 		# AABBCC.DD
@@ -139,10 +150,10 @@ class MyAgent(AlphaBetaAgent):
 		dispersive_play = ((state.size - 2)**2 - counter)
 
 		opponents_bridge_weight = 1
-		my_bridge_weight = 1e-4
-		my_pawn_safe_weight = 1e-2
+		my_bridge_weight = 1e-2
+		my_pawn_safe_weight = 1e-4
 		opponents_pawn_blocked_weight = 1e4
-		dispersive_play_weight = 0
+		dispersive_play_weight = 1e-6
 
 		weight = opponents_bridge * opponents_bridge_weight + \
 		        my_bridge * my_bridge_weight + \
