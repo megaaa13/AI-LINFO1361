@@ -21,7 +21,8 @@ class MyAgent(AlphaBetaAgent):
 	state s.
 	"""
 	def successors(self, state: pontu_state.PontuState):
-		available_actions = [i for i in range(0, state.size - 1)]
+		available_actions_3 = [i for i in range(0, state.size - 1)]
+		available_actions_4 = [i for i in range(0, state.size)]
 		actions = []
 		for i in range(state.size-2): # for each pawn
 			if not state.blocked[state.cur_player][i]: # if the pawn is not blocked
@@ -29,44 +30,34 @@ class MyAgent(AlphaBetaAgent):
 				for dir in dirs: # for each direction the pawn can move towards
 					for pawn in range(state.size-2):
 						pos = state.get_pawn_position(1- self.id,pawn)
-						if (pos[0] - 1) in available_actions and (pos[1] in available_actions):
+						if (pos[0] - 1) in available_actions_3 and (pos[1] in available_actions_4):
 							if state.h_bridges[pos[1]][pos[0] - 1]:
 								actions.append((i,dir, 'h', pos[0] - 1, pos[1]))
-						if pos[0] in available_actions and pos[1] in available_actions:
+						if pos[0] in available_actions_3 and pos[1] in available_actions_4:
 							if state.h_bridges[pos[1]][pos[0]]:
 								actions.append((i,dir, 'h', pos[0], pos[1]))
-						if (pos[1] - 1) in available_actions and pos[0] in available_actions:
+						if (pos[1] - 1) in available_actions_3 and pos[0] in available_actions_4:
 							if state.v_bridges[pos[1]-1][pos[0]]:
 								actions.append((i,dir, 'v', pos[0], pos[1] - 1))
-						if pos[1] in available_actions and pos[0] in available_actions:
+						if pos[1] in available_actions_3 and pos[0] in available_actions_4:
 							if state.v_bridges[pos[1]][pos[0]]:
 								actions.append((i,dir, 'v', pos[0], pos[1]))
-
-					"""for y in range(len(state.h_bridges)): # for each y position of horizontal bridges
-						for x in range(len(state.h_bridges[y])): # for each x position of the horizontal bridges
-							if state.h_bridges[y][x]: # if the horizontal bridge is present
-								actions.append((i,dir,'h',x,y)) # add the corresponding action to the list
-					for y in range(len(state.v_bridges)): # for each y position of vertical bridges
-						for x in range(len(state.v_bridges[y])): # for each x position of the vertical bridges
-							if state.v_bridges[y][x]: # if the vertical bridge is present
-								actions.append((i,dir,'v',x,y)) # add the corresponding action to the list"""
 		if len(actions) == 0:
             # then the valid actions consist only on the removal of one bridge
 			for pawn in range(state.size-2):
 				pos = state.get_pawn_position(1- self.id,pawn)
-				if (pos[0] - 1) in available_actions and (pos[1] in available_actions):
+				if (pos[0] - 1) in available_actions_3 and (pos[1] in available_actions_4):
 					if state.h_bridges[pos[1]][pos[0] - 1]:
 						actions.append((None, None, 'h', pos[0] - 1, pos[1]))
-				if pos[0] in available_actions and pos[1] in available_actions:
+				if pos[0] in available_actions_3 and pos[1] in available_actions_4:
 					if state.h_bridges[pos[1]][pos[0]]:
 						actions.append((None, None, 'h', pos[0], pos[1]))
-				if (pos[1] - 1) in available_actions and pos[0] in available_actions:
+				if (pos[1] - 1) in available_actions_3 and pos[0] in available_actions_4:
 					if state.v_bridges[pos[1]-1][pos[0]]:
 						actions.append((None, None, 'v', pos[0], pos[1] - 1))
-				if pos[1] in available_actions and pos[0] in available_actions:
+				if pos[1] in available_actions_3 and pos[0] in available_actions_4:
 					if state.v_bridges[pos[1]][pos[0]]:
 						actions.append((None, None, 'v', pos[0], pos[1]))
-		print(actions)
 		for action in actions:
 			new_state = state.copy()
 			new_state.apply_action(action)	
