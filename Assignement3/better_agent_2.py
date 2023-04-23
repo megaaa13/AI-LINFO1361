@@ -21,6 +21,12 @@ class MyAgent(AlphaBetaAgent):
 	state s.
 	"""
 	def successors(self, state: pontu_state.PontuState):
+		for action in actions:
+			new_state = state.copy()
+			new_state.apply_action(action)	
+			yield (action, new_state)
+
+	def get_simply_actions(self, state: pontu_state.PontuState):
 		available_actions_3 = [i for i in range(0, state.size - 1)]
 		available_actions_4 = [i for i in range(0, state.size)]
 		actions = []
@@ -59,10 +65,7 @@ class MyAgent(AlphaBetaAgent):
 				if pos[1] in available_actions_3 and pos[0] in available_actions_4:
 					if state.v_bridges[pos[1]][pos[0]]:
 						actions.append((None, None, 'v', pos[0], pos[1]))
-		for action in actions:
-			new_state = state.copy()
-			new_state.apply_action(action)	
-			yield (action, new_state)
+		return actions
 
 	"""
 	The cutoff function returns true if the alpha-beta/minimax
