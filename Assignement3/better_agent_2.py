@@ -21,6 +21,10 @@ class MyAgent(AlphaBetaAgent):
 	state s.
 	"""
 	def successors(self, state: pontu_state.PontuState):
+		actions = self.get_simply_actions(state)
+		# actions = state.get_current_player_actions()
+
+		np.random.shuffle(actions)
 		for action in actions:
 			new_state = state.copy()
 			new_state.apply_action(action)	
@@ -44,13 +48,14 @@ class MyAgent(AlphaBetaAgent):
 							if state.h_bridges[pos[1]][pos[0]]:
 								actions.append((i,dir, 'h', pos[0], pos[1]))
 						if (pos[1] - 1) in available_actions_3 and pos[0] in available_actions_4:
-							if state.v_bridges[pos[1]-1][pos[0]]:
+							if state.v_bridges[pos[1]-1][pos[0]]: 
 								actions.append((i,dir, 'v', pos[0], pos[1] - 1))
 						if pos[1] in available_actions_3 and pos[0] in available_actions_4:
 							if state.v_bridges[pos[1]][pos[0]]:
 								actions.append((i,dir, 'v', pos[0], pos[1]))
+		
+		# then the valid actions consist only on the removal of one bridge
 		if len(actions) == 0:
-            # then the valid actions consist only on the removal of one bridge
 			for pawn in range(state.size-2):
 				pos = state.get_pawn_position(1- self.id,pawn)
 				if (pos[0] - 1) in available_actions_3 and (pos[1] in available_actions_4):
@@ -74,7 +79,7 @@ class MyAgent(AlphaBetaAgent):
 	def cutoff(self, state, depth):
 		if state.game_over():
 			return True
-		if depth > (self.evaluate(state) // 1e4) + 1:
+		if depth > 2:
 			return True
 		return False
 
@@ -114,8 +119,6 @@ class MyAgent(AlphaBetaAgent):
 		list = []
 		for i in range(0, state.size - 2):
 			list.append(state.get_pawn_position(self.id, i))
-		
-		# print(list)
 
 		counter = 0
 		for i in range(0, len(list)):
@@ -129,9 +132,29 @@ class MyAgent(AlphaBetaAgent):
 		#   - BB: number of my pawn safe
 		#   - CC: number of oppenent's bridges
 		#   - DD: number of my bridges
-		weight = ((state.size - 2) * 4 - nb_bridges_opponent) + nb_bridges_me * 1e-4 \
-			+ nb_pawn_safe_me * 1e-2 + nb_pawn_blocked_opponent * 1e4 + ((state.size - 2)**2 - counter) * 1e-6
+		opponents_bridge = ((state.size - 2) * 4 - nb_bridges_opponent)
+		my_bridge = nb_bridges_me
+		my_pawn_safe = nb_pawn_safe_me
+		opponents_pawn_blocked = nb_pawn_blocked_opponent
+		dispersive_play = ((state.size - 2)**2 - counter)
+
+		opponents_bridge_weight = 1
+		my_bridge_weight = 1e-4
+		my_pawn_safe_weight = 1e-2
+		opponents_pawn_blocked_weight = 1e4
+		dispersive_play_weight = 0
+
+		weight = opponents_bridge * opponents_bridge_weight + \
+		        my_bridge * my_bridge_weight + \
+		        my_pawn_safe * my_pawn_safe_weight + \
+				opponents_pawn_blocked * opponents_pawn_blocked_weight + \
+				dispersive_play * dispersive_play_weight
+		
+		# weight = ((state.size - 2) * 4 - nb_bridges_opponent) + nb_bridges_me * 1e-4 \
+		# + nb_pawn_safe_me * 1e-2 + nb_pawn_blocked_opponent * 1e4 + ((state.size - 2)**2 - counter) * 1e-6
 		
 		# print("", weight, end="- ")
 		return weight
 		
+	def get_name(self):
+		return "better agent 2"
