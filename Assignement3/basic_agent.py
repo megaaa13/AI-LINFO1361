@@ -52,3 +52,5 @@ class MyAgent(AlphaBetaAgent):
 		# print("Evaluate : ", 12 - nb_bridges)    
 		return (state.size - 2) * 4 - nb_bridges
      
+	def get_name(self):
+		return "basic agent"

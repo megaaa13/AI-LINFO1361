@@ -96,3 +96,5 @@ class MyAgent(AlphaBetaAgent):
 		# print("", weight, end="- ")
 		return weight
 		
+	def get_name(self):
+		return "better agent 2"

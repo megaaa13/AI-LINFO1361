@@ -54,3 +54,5 @@ class MyAgent(AlphaBetaAgent):
 					nb_bridges_me += 1
 		return ((state.size - 2) * 4 - nb_bridges) + nb_bridges_me*1e-2
 		
+	def get_name(self):
+		return "better agent 1"
