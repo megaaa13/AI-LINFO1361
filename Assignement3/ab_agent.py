@@ -1,15 +1,10 @@
-# TODO: renformat the imports for inginious
 from agent import AlphaBetaAgent
-import minimax as minimax
+import minimax
 import pontu_state as pontu_state
-import numpy as np
 
 
 class MyAgent(AlphaBetaAgent):
 
-	"""
-	This is the skeleton of an agent to play the Tak game.
-	"""
 	def get_action(self, state, last_action, time_left):
 		self.last_action = last_action
 		self.time_left = time_left
@@ -20,6 +15,7 @@ class MyAgent(AlphaBetaAgent):
 	pairs (a, s) in which a is the action played to reach the
 	state s.
 	"""
+
 	def successors(self, state: pontu_state.PontuState):
 		actions = self.get_simply_actions(state)
 		# actions = state.get_current_player_actions()
@@ -38,28 +34,31 @@ class MyAgent(AlphaBetaAgent):
 		available_actions_3 = [i for i in range(0, state.size - 1)]
 		available_actions_4 = [i for i in range(0, state.size)]
 		actions = []
-		for i in range(state.size-2): # for each pawn
-			if not state.blocked[state.cur_player][i]: # if the pawn is not blocked
-				dirs = state.move_dir(state.cur_player,i)
-				for dir in dirs: # for each direction the pawn can move towards
+		for i in range(state.size-2):  # for each pawn
+			if not state.blocked[state.cur_player][i]:  # if the pawn is not blocked
+				dirs = state.move_dir(state.cur_player, i)
+				for dir in dirs:  # for each direction the pawn can move towards
 					for pawn in range(state.size-2):
-						pos = state.get_pawn_position(1 - state.cur_player,pawn)
+						pos = state.get_pawn_position(
+							1 - state.cur_player, pawn)
 						if (pos[0] - 1) in available_actions_3 and (pos[1] in available_actions_4):
 							if state.h_bridges[pos[1]][pos[0] - 1]:
-								actions.append((i,dir, 'h', pos[0] - 1, pos[1]))
+								actions.append(
+									(i, dir, 'h', pos[0] - 1, pos[1]))
 						if pos[0] in available_actions_3 and pos[1] in available_actions_4:
 							if state.h_bridges[pos[1]][pos[0]]:
-								actions.append((i,dir, 'h', pos[0], pos[1]))
+								actions.append((i, dir, 'h', pos[0], pos[1]))
 						if (pos[1] - 1) in available_actions_3 and pos[0] in available_actions_4:
-							if state.v_bridges[pos[1]-1][pos[0]]: 
-								actions.append((i,dir, 'v', pos[0], pos[1] - 1))
+							if state.v_bridges[pos[1]-1][pos[0]]:
+								actions.append(
+									(i, dir, 'v', pos[0], pos[1] - 1))
 						if pos[1] in available_actions_3 and pos[0] in available_actions_4:
 							if state.v_bridges[pos[1]][pos[0]]:
-								actions.append((i,dir, 'v', pos[0], pos[1]))
-								
+								actions.append((i, dir, 'v', pos[0], pos[1]))
+
 		if len(actions) == 0:
 			for pawn in range(state.size-2):
-				pos = state.get_pawn_position(1- state.cur_player,pawn)
+				pos = state.get_pawn_position(1 - state.cur_player, pawn)
 				if (pos[0] - 1) in available_actions_3 and (pos[1] in available_actions_4):
 					if state.h_bridges[pos[1]][pos[0] - 1]:
 						actions.append((None, None, 'h', pos[0] - 1, pos[1]))
@@ -73,11 +72,11 @@ class MyAgent(AlphaBetaAgent):
 					if state.v_bridges[pos[1]][pos[0]]:
 						actions.append((None, None, 'v', pos[0], pos[1]))
 		return actions
-
 	"""
 	The cutoff function returns true if the alpha-beta/minimax
 	search has to stop and false otherwise.
 	"""
+
 	def cutoff(self, state, depth):
 		if state.game_over():
 			return True
@@ -95,78 +94,79 @@ class MyAgent(AlphaBetaAgent):
 	The evaluate function must return an integer value
 	representing the utility function of the board.
 	"""
+	
 	def evaluate(self, state: pontu_state.PontuState):
 		nb_bridges_opponent = 0
 		nb_bridges_me = 0
-		# Bridge count
+
+		nb_pawn_blocked_opponent = 0
+		nb_pawn_blocked_me = 0
+
+		nb_pawn_safe_me = 0
+		nb_pawn_safe_opponent = 0
+
+		nb_near_center_me = 0
+		nb_near_center_opponent = 0
+
+		nb_available_moves_me = 0
+		nb_available_moves_opponent = 0
+		
+
 		for i in range(0, state.size - 2):
-			nb_bridges_opponent_temp = 0
-			nb_bridges_me_temp = 0
-			# Count opponent bridges
+
+			#Nb bridges for the opponent
 			for bridge in state.adj_bridges(1 - self.id, i).values():
 				if bridge:
-					nb_bridges_opponent_temp += 1
-			nb_bridges_opponent += nb_bridges_opponent_temp ** 2
-			
-			# Count my bridges
+					nb_bridges_opponent += 1
+			#Nb bridges for me
 			for bridge in state.adj_bridges(self.id, i).values():
 				if bridge:
-					nb_bridges_me_temp += 1
-			nb_bridges_me += nb_bridges_me_temp ** 2
+					nb_bridges_me += 1
 
-		# Save one of our spawn (only if the next case has two or more bridges)
-		nb_pawn_safe_me = 0
-		for i in range(0, state.size - 2):
-			if sum(1 for v in state.adj_bridges(self.id, i).values() if v == True) >= 2:
-				nb_pawn_safe_me += 1
-
-		# Block opponent spawn
-		nb_pawn_blocked_opponent = 0
-		for i in range(0, state.size - 2):
+			#Blocked pawn
 			if state.is_pawn_blocked(1 - self.id, i):
 				nb_pawn_blocked_opponent += 1
-		
-		# Perfer dispersive play
+
+			if state.is_pawn_blocked(self.id, i):
+				nb_pawn_blocked_me += 1
+
+			#Is pawn in a safe position ?
+			if sum(1 for v in state.adj_bridges(self.id, i).values() if v == True) >= 2:
+				nb_pawn_safe_me += 1
+			
+			if sum(1 for v in state.adj_bridges(1 - self.id, i).values() if v == True) >= 2:
+				nb_pawn_safe_opponent += 1
+			
+			# Aim the center
+			nb_near_center_me += (state.size//2 + 1 - abs(state.get_pawn_position(self.id, i)[0]) + abs(state.size//2 + 1 - state.get_pawn_position(self.id, i)[1]))**2 if not state.is_pawn_blocked(self.id, i) else 0
+			nb_near_center_opponent += (state.size//2 + 1 - abs(state.get_pawn_position(1 - self.id, i)[0]) + abs(state.size//2 + 1 - state.get_pawn_position(1 - self.id, i)[1]))**2 if not state.is_pawn_blocked(1 - self.id, i) else 0
+
+			#Nb available moves
+			nb_available_moves_me += len(state.move_dir(self.id, i))
+			nb_available_moves_opponent += len(state.move_dir(1 - self.id, i))
+
+
+		# Dispersed pawns (not too near from each other)
+		dispersive = 0
 		list = []
 		for i in range(0, state.size - 2):
 			list.append(state.get_pawn_position(self.id, i))
 
-		counter = 0
-		for i in range(0, len(list)):
-			for j in range(0, len(list)):
-				if list[i] != list[j] and (abs(list[i][1] - list[j][1]) + abs(list[i][0] - list[j][0])) == 1:
-					counter += 1
+		for j in range(0, len(list)):
+			if list[i] != list[j] and (abs(list[i][1] - list[j][1]) + abs(list[i][0] - list[j][0])) == 1:
+				dispersive += 1
 
+		for i in range(0, state.size - 2):
+			list.append(state.get_pawn_position(1 - self.id, i))
 
-		# Set a weight to our bridges to make playing offensive more interesting
-		# AABBCC.DD
-		#   - AA: number of oppenent pawn blocked
-		#   - BB: number of my pawn safe
-		#   - CC: number of oppenent's bridges
-		#   - DD: number of my bridges
-		opponents_bridge = ((state.size - 2) * 4**2 - nb_bridges_opponent)
-		my_bridge = nb_bridges_me
-		my_pawn_safe = nb_pawn_safe_me
-		opponents_pawn_blocked = nb_pawn_blocked_opponent
-		dispersive_play = ((state.size - 2)**2 - counter)
+		for j in range(0, len(list)):
+			if list[i] != list[j] and (abs(list[i][1] - list[j][1]) + abs(list[i][0] - list[j][0])) == 1:
+				dispersive -= 1
 
-		opponents_bridge_weight = 1
-		my_bridge_weight = 1e-2
-		my_pawn_safe_weight = 1e-4
-		opponents_pawn_blocked_weight = 0
-		dispersive_play_weight = 0
+		bridges = nb_bridges_me - nb_bridges_opponent
+		pawns = nb_pawn_blocked_opponent - nb_pawn_blocked_me
+		safe_pawns = nb_pawn_safe_me - nb_pawn_safe_opponent
+		near_center = nb_near_center_opponent - nb_near_center_me
+		available_moves = nb_available_moves_me - nb_available_moves_opponent
 
-		weight = opponents_bridge * opponents_bridge_weight + \
-		        my_bridge * my_bridge_weight + \
-		        my_pawn_safe * my_pawn_safe_weight + \
-				opponents_pawn_blocked * opponents_pawn_blocked_weight + \
-				dispersive_play * dispersive_play_weight
-		
-		# weight = ((state.size - 2) * 4 - nb_bridges_opponent) + nb_bridges_me * 1e-4 \
-		# + nb_pawn_safe_me * 1e-2 + nb_pawn_blocked_opponent * 1e4 + ((state.size - 2)**2 - counter) * 1e-6
-		
-		# print("", weight, end="- ")
-		return weight
-		
-	def get_name(self):
-		return "better agent 2"
+		return bridges*2 + pawns*1e3 + safe_pawns + dispersive*1e-3 + near_center * 1e-2 + available_moves
