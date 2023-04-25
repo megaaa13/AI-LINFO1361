@@ -169,4 +169,9 @@ class MyAgent(AlphaBetaAgent):
 		near_center = nb_near_center_opponent - nb_near_center_me
 		available_moves = nb_available_moves_me - nb_available_moves_opponent
 
-		return bridges*2 + pawns*1e3 + safe_pawns + dispersive*1e-3 + near_center * 1e-2 + available_moves
+		w1, w2, w3, w4, w5, w6 = self.weight
+
+		return bridges*w1 + pawns*w2 + safe_pawns*w3 + dispersive*w4 + near_center * w5 + available_moves*w6
+	
+	def set_weights(self, w):
+		self.weight = w

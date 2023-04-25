@@ -95,12 +95,11 @@ class NeuralGenetic:
                 fitness[j] = self.fitness(population[j], opponents)
             
             # Normalize fitness
-            fitness_range = np.max(fitness) - np.min(fitness)
-            if fitness_range != 0:
-                fitness = (fitness - np.min(fitness)) / fitness_range
-            else:
+            if np.abs(np.sum(fitness)) < 0.1:
                 # handle the case where the range is zero (e.g. set all fitness values to 0)
                 fitness = np.array([1/population_size for _ in range(population_size)])
+            else:
+                fitness = fitness / np.sum(fitness)
             if np.sum(fitness) != 0:
                 diff = 1 - np.sum(fitness)
                 fitness = fitness + diff / population_size
