@@ -96,6 +96,15 @@ class MyAgent(AlphaBetaAgent):
 	"""
 	
 	def evaluate(self, state: pontu_state.PontuState):
+
+		prior_attack = 1
+		prior_def = 1
+		for paw in range(state.size - 2):
+			if state.is_pawn_blocked(1 - self.id, paw):
+				prior_attack += 1
+			if state.is_pawn_blocked(self.id, paw):
+				prior_def += 1
+
 		nb_bridges_opponent = 0
 		nb_bridges_me = 0
 
@@ -149,29 +158,26 @@ class MyAgent(AlphaBetaAgent):
 		# Dispersed pawns (not too near from each other)
 		dispersive = 0
 		list = []
-		for i in range(0, state.size - 2):
-			list.append(state.get_pawn_position(self.id, i))
+		for k in range(0, state.size - 2):
+			list.append(state.get_pawn_position(self.id, k))
 
 		for j in range(0, len(list)):
 			if list[i] != list[j] and (abs(list[i][1] - list[j][1]) + abs(list[i][0] - list[j][0])) == 1:
 				dispersive += 1
-
-		for i in range(0, state.size - 2):
-			list.append(state.get_pawn_position(1 - self.id, i))
+		list = []
+		for k in range(0, state.size - 2):	
+			list.append(state.get_pawn_position(1 - self.id, k))
 
 		for j in range(0, len(list)):
 			if list[i] != list[j] and (abs(list[i][1] - list[j][1]) + abs(list[i][0] - list[j][0])) == 1:
 				dispersive -= 1
 
-		bridges = nb_bridges_me - nb_bridges_opponent
-		pawns = nb_pawn_blocked_opponent - nb_pawn_blocked_me
-		safe_pawns = nb_pawn_safe_me - nb_pawn_safe_opponent
-		near_center = nb_near_center_opponent - nb_near_center_me
-		available_moves = nb_available_moves_me - nb_available_moves_opponent
+		bridges = nb_bridges_me * prior_def - nb_bridges_opponent * prior_attack
+		pawns = nb_pawn_blocked_opponent * prior_attack - nb_pawn_blocked_me * prior_def
+		safe_pawns = nb_pawn_safe_me * prior_def - nb_pawn_safe_opponent * prior_attack
+		near_center = nb_near_center_opponent * prior_attack - nb_near_center_me * prior_def
+		available_moves = nb_available_moves_me * prior_def - nb_available_moves_opponent * prior_attack
 
-		w1, w2, w3, w4, w5, w6 = self.weight
+		w1, w2, w3, w4, w5, w6 = [3, 2, 1, 1e3, 1e-3, 1e-2]
 
-		return bridges*w1 + pawns*w2 + safe_pawns*w3 + dispersive*w4 + near_center * w5 + available_moves*w6
-	
-	def set_weights(self, w):
-		self.weight = w
+		return bridges*w1 + available_moves*w2 + safe_pawns*w3 + pawns*w4 + dispersive*w5 + near_center*w6
