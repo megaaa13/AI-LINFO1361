@@ -91,6 +91,12 @@ class MyAgent(AlphaBetaAgent):
 		dispersive = 0		
 
 		# Parameters calculation
+		my_pawns_pos = []
+		opponent_pawns_pos = []
+		for k in range(0, state.size - 2):
+			my_pawns_pos.append(state.get_pawn_position(self.id, k))
+			opponent_pawns_pos.append(state.get_pawn_position(1 - self.id, k))
+
 		for i in range(0, state.size - 2):
 			# Briges
 			for bridge in state.adj_bridges(1 - self.id, i).values():
@@ -118,18 +124,12 @@ class MyAgent(AlphaBetaAgent):
 			nb_available_moves_me += len(state.move_dir(self.id, i))
 			nb_available_moves_opponent += len(state.move_dir(1 - self.id, i))
 
-			# Dispersed pawns (not too near from each other)
-			my_pawns_pos = []
-			opponent_pawns_pos = []
-			for k in range(0, state.size - 2):
-				my_pawns_pos.append(state.get_pawn_position(self.id, k))
-				opponent_pawns_pos.append(state.get_pawn_position(1 - self.id, k))
-
-			for j in range(0, len(my_pawns_pos)):
-				if my_pawns_pos[i] != my_pawns_pos[j] and (abs(my_pawns_pos[i][1] - my_pawns_pos[j][1]) + abs(my_pawns_pos[i][0] - my_pawns_pos[j][0])) == 1:
-					dispersive += 1
-				if opponent_pawns_pos[i] != opponent_pawns_pos[j] and (abs(opponent_pawns_pos[i][1] - opponent_pawns_pos[j][1]) + abs(opponent_pawns_pos[i][0] - opponent_pawns_pos[j][0])) == 1:
-					dispersive -= 1
+		# Dispersed pawns (not too near from each other)
+		for j in range(i, state.size - 2):
+			if my_pawns_pos[i] != my_pawns_pos[j] and (abs(my_pawns_pos[i][1] - my_pawns_pos[j][1]) + abs(my_pawns_pos[i][0] - my_pawns_pos[j][0])) == 1:
+				dispersive += 1
+			if opponent_pawns_pos[i] != opponent_pawns_pos[j] and (abs(opponent_pawns_pos[i][1] - opponent_pawns_pos[j][1]) + abs(opponent_pawns_pos[i][0] - opponent_pawns_pos[j][0])) == 1:
+				dispersive -= 1
 
 		# Attack and defense weights
 		bridges, w1			= priority_defense * nb_bridges_me  		  - priority_attack  * nb_bridges_opponent,			3
