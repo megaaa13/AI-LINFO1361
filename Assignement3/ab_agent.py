@@ -86,7 +86,7 @@ class MyAgent(AlphaBetaAgent):
 				a += 1
 			if state.is_pawn_blocked(1 - self.id, i):
 				a += 1
-		if depth > 1 + a:
+		if depth > 2 + a:
 			return True
 		return False
 
