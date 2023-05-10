@@ -33,17 +33,17 @@ class State:
 
 class AtomPlacement(Problem):
 
-    # if you want you can implement this method and use it in the maxvalue and randomized_maxvalue functions
     def successor(self, state: State):
         l = []
-        for edge in state.edges:
-            sites = state.sites.copy()
-            #swap
-            sites[edge[0]], sites[edge[1]] = sites[edge[1]], sites[edge[0]]
-            l.append((state, State(state.n_sites, state.n_types, state.edges, state.energy_matrix, sites)))
+        for i in range(state.n_sites):
+            for j in range(i + 1, state.n_sites):
+                if state.sites[i] == state.sites[j] or i == j:
+                    continue
+                sites = state.sites.copy()
+                sites[i], sites[j] = sites[j], sites[i]
+                l.append((state, State(state.n_sites, state.n_types, state.edges, state.energy_matrix, sites)))
         return l
 
-    # if you want you can implement this method and use it in the maxvalue and randomized_maxvalue functions
     def value(self, state: State):
         return sum([state.energy_matrix[state.sites[i]][state.sites[j]] for i, j in state.edges])
 
@@ -74,19 +74,21 @@ def read_instance(instanceFile):
 
 
 # Attention : Depending of the objective function you use, your goal can be to maximize or to minimize it
-#?  8/14 on inginious, fuck
+#*  14/14 on inginious ┬─┬ノ( º _ ºノ)
 def maxvalue(problem :Problem, limit=100, callback=None):
     current = LSNode(problem, problem.initial, 0)
     best = current
     for i in range(limit):
-        current = min(best.expand(), key=lambda x: x.value())
+        current = min(current.expand(), key=lambda x: x.value())
         if best.value() > current.value():
             best = current
+    # print("Number of iterations : ", best.step)
+    # print("Value :" , best.value())
     return best
 
 
 # Attention : Depending of the objective function you use, your goal can be to maximize or to minimize it
-#! Currently not working well (8/14 on inginious)
+#* Seems to work : 12/14 on inginious, enough but (╯°□°)╯︵ ┻━┻
 def randomized_maxvalue(problem, limit=100, callback=None):
     current = LSNode(problem, problem.initial, 0)
     for _ in range(limit):
@@ -104,6 +106,6 @@ if __name__ == '__main__':
     init_state = State(info[0], info[1], info[2], info[3])
     ap_problem = AtomPlacement(init_state)
     step_limit = 100
-    node = maxvalue(ap_problem, 100, step_limit)
+    node = randomized_maxvalue(ap_problem, 100, step_limit)
     state = node.state
     print(state)
