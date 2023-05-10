@@ -74,7 +74,7 @@ def read_instance(instanceFile):
 
 
 # Attention : Depending of the objective function you use, your goal can be to maximize or to minimize it
-#? 8 on 14 on inginious (12 required)
+#?  8/14 on inginious, fuck
 def maxvalue(problem :Problem, limit=100, callback=None):
     current = LSNode(problem, problem.initial, 0)
     best = current
@@ -86,7 +86,7 @@ def maxvalue(problem :Problem, limit=100, callback=None):
 
 
 # Attention : Depending of the objective function you use, your goal can be to maximize or to minimize it
-#! Currently not working well
+#! Currently not working well (8/14 on inginious)
 def randomized_maxvalue(problem, limit=100, callback=None):
     current = LSNode(problem, problem.initial, 0)
     for _ in range(limit):
@@ -104,6 +104,6 @@ if __name__ == '__main__':
     init_state = State(info[0], info[1], info[2], info[3])
     ap_problem = AtomPlacement(init_state)
     step_limit = 100
-    node = randomized_maxvalue(ap_problem, 100, step_limit)
+    node = maxvalue(ap_problem, 100, step_limit)
     state = node.state
     print(state)
