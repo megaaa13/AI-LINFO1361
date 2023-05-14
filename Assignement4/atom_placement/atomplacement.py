@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 """NAMES OF THE AUTHOR(S): Auguste Burlats <auguste.burlats@uclouvain.be>"""
 from search import *
-
+import time
 class State:
 
     def __init__(self, n_sites, n_types, edges, energy_matrix, sites=None):
@@ -106,6 +106,11 @@ if __name__ == '__main__':
     init_state = State(info[0], info[1], info[2], info[3])
     ap_problem = AtomPlacement(init_state)
     step_limit = 100
+    start = time.time()
     node = randomized_maxvalue(ap_problem, 100, step_limit)
+    end = time.time()
+    print("Time : ", round(end - start, 3), "s")
+    print("Value : ", node.value())
+    print("Number of iterations : ", node.step)
     state = node.state
     print(state)
