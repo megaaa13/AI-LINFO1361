@@ -41,6 +41,7 @@ def get_expression(size, fixed_cells=None):
             expression.append(constrain_clause)
 
     # There is only one shape and one color per cell : !C(ijab) or !C(ija2b2) for all a2, b2 != a, b
+    # Each pair shape/color must be unique : !C(ijab) or !C(ijab), i, j != i2, j2
     for i in range(size):
         for j in range(size):
             for a in range(size):
@@ -48,23 +49,17 @@ def get_expression(size, fixed_cells=None):
                     for a2 in range(size):
                         for b2 in range(size):
                             if a != a2 or b != b2:
+                                # Only one per cell
                                 single_clause = Clause(size)
                                 single_clause.add_negative(i, j, a, b)
                                 single_clause.add_negative(i, j, a2, b2)
-                                expression.append(single_clause)     
-
-    # Each pair shape/color must be unique : !C(ijab) or !C(ijab), i, j != i2, j2
-    for a in range(size):
-        for b in range(size):
-            for i in range(size):
-                for j in range(size):
-                    for i2 in range(size):
-                        for j2 in range(size):
-                            if i != i2 or j != j2:
+                                expression.append(single_clause) 
+                            
+                                # It must be unique   
                                 unique_clause = Clause(size)
-                                unique_clause.add_negative(i, j, a, b)
-                                unique_clause.add_negative(i2, j2, a, b)
-                                expression.append(unique_clause)                     
+                                unique_clause.add_negative(a, b, i, j)
+                                unique_clause.add_negative(a2, b2, i, j)
+                                expression.append(unique_clause)                                          
 
     # Each shape and each color must be found in each line 
     # Each shape and each color must be found in each column
