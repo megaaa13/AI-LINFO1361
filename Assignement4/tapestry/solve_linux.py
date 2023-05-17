@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from tapestry_solver_solution import get_expression
+from tapestry_solver import get_expression
 import minisat
 
 
