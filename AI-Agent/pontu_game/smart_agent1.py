@@ -1,6 +1,7 @@
 from agent import AlphaBetaAgent
 import minimax
 import pontu_state as pontu_state
+import numpy as np
 
 
 class MyAgent(AlphaBetaAgent):
@@ -85,15 +86,11 @@ class MyAgent(AlphaBetaAgent):
 		nb_near_center_opponent = 0
 
 		nb_available_moves_me = 0
-		nb_available_moves_opponent = 0	
+		nb_available_moves_opponent = 0
+
+		dispersive = 0		
 
 		# Parameters calculation
-		my_pawns_pos = []
-		opponent_pawns_pos = []
-		for k in range(0, state.size - 2):
-			my_pawns_pos.append(state.get_pawn_position(self.id, k))
-			opponent_pawns_pos.append(state.get_pawn_position(1 - self.id, k))
-
 		for i in range(0, state.size - 2):
 			# Briges
 			for bridge in state.adj_bridges(1 - self.id, i).values():
@@ -121,15 +118,32 @@ class MyAgent(AlphaBetaAgent):
 			nb_available_moves_me += len(state.move_dir(self.id, i))
 			nb_available_moves_opponent += len(state.move_dir(1 - self.id, i))
 
-		# Attack and defense weights
-		bridges, w1			= priority_defense * nb_bridges_me  		  - priority_attack  * nb_bridges_opponent,			3
-		pawns, w2			= priority_attack  * nb_pawn_blocked_opponent - priority_defense * nb_pawn_blocked_me,		    1e3
-		safe_pawns, w3 		= priority_defense * nb_pawn_safe_me 		  - priority_attack  * nb_pawn_safe_opponent, 		1
-		near_center, w4 	= priority_attack  * nb_near_center_opponent  - priority_defense * nb_near_center_me,			1e-2
-		available_moves, w5 = priority_defense * nb_available_moves_me 	  - priority_attack  * nb_available_moves_opponent, 2
+			# Dispersed pawns (not too near from each other)
+			my_pawns_pos = []
+			opponent_pawns_pos = []
+			for k in range(0, state.size - 2):
+				my_pawns_pos.append(state.get_pawn_position(self.id, k))
+				opponent_pawns_pos.append(state.get_pawn_position(1 - self.id, k))
 
-		# Return
-		return bridges * w1 + pawns * w2 + safe_pawns * w3 + near_center * w4 + available_moves * w5 
+			for j in range(0, len(my_pawns_pos)):
+				if my_pawns_pos[i] != my_pawns_pos[j] and (abs(my_pawns_pos[i][1] - my_pawns_pos[j][1]) + abs(my_pawns_pos[i][0] - my_pawns_pos[j][0])) == 1:
+					dispersive += 1
+				if opponent_pawns_pos[i] != opponent_pawns_pos[j] and (abs(opponent_pawns_pos[i][1] - opponent_pawns_pos[j][1]) + abs(opponent_pawns_pos[i][0] - opponent_pawns_pos[j][0])) == 1:
+					dispersive -= 1
+
+		# Attack and defense weights
+		bridges 		= priority_defense * nb_bridges_me  			- priority_attack  * nb_bridges_opponent
+		pawns 			= priority_attack  * nb_pawn_blocked_opponent	- priority_defense * nb_pawn_blocked_me
+		safe_pawns  	= priority_defense * nb_pawn_safe_me 			- priority_attack  * nb_pawn_safe_opponent 
+		near_center 	= priority_attack  * nb_near_center_opponent  	- priority_defense * nb_near_center_me
+		available_moves = priority_defense * nb_available_moves_me 		- priority_attack  * nb_available_moves_opponent
+		dispersive 		= dispersive
+
+		w1, w2, w3, w4, w5, w6 = [3, 2, 1, 1e3, 1e-3, 1e-2]
+
+		return bridges*w1 + available_moves*w2 + safe_pawns*w3 + pawns*w4 + dispersive*w5 + near_center*w6
+	
+
 
 	#############################################################################################################
 	#											Helper functions												#
